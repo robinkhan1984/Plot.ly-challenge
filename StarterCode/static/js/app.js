@@ -1,31 +1,44 @@
 
 function makePage(){
 
-    d3.json("/samples.json").then((data) => {
+    d3.json("static/js/samples.json").then((data) => {
         
-        var name = data.names;
+        var names = data.names;
         var metadata = data.metadata;
         var samples = data.samples;
         
         //drop down menu
         var dropdown = document.getElementById("selDataset");
-        for (var i = 0 ; i<name.length; ++i) {
-            dropdown[dropdown.length] = new Option(name[i], name[i]);
+        for (var i = 0 ; i<names.length; ++i) {
+            dropdown[dropdown.length] = new Option(names[i], names[i]);
         }
 
-        d3.selectAll("selDataset").on("change", getData);
+        d3.selectAll("#selDataset").on("change", getData);
 
         function getData() {
             var dropdownMenu = d3.select("#selDataset");
-            var dtaset = dropdownMenu.property("value");
-            var index = name.indexOf(dataset);
+            var dataset = dropdownMenu.property("value");
+            var index = names.indexOf(dataset);
             var sample_values = samples.map(object => object.sample_values);
             var otu_ids = samples.map(object => object.otu_ids);
             var otu_labels = samples.map(object => object.otu_labels);
             var sample_value = sample_values[index];
-            var otu_ids = otu_ids[index];
+            var otu_id = otu_ids[index];
             var otujnumber = otu_ids[index];
             var otu_label = otu_labels[index];
+
+            var mdata = metadata[index];
+            mdata = [mdata];
+            mdata = mdata[0];
+            var space = d3.select(".panel-body");
+            space.html("");
+            space.append("li").text(`ID Number: ${mdata.id}`);
+            space.append("li").text(`Age: ${mdata.age}`);
+            space.append("li").text(`BBTYPE: ${mdata.bbtype}`);
+            space.append("li").text(`Race: ${mdata.ethnicity}`);
+            space.append("li").text(`Sex: ${mdata.gender}`);
+            space.append("li").text(`Location: ${mdata.location}`);
+            space.append("li").text(`WFREQ: ${mdata.wfreq}`);
 
             var mdata = metadata[index];
             mdata = [mdata];
@@ -33,13 +46,13 @@ function makePage(){
             console.log(mdata);
             var space = d3.select(".panel-body");
             space.html("");
-            space.append("li").text('ID Number: ${mdata.id}');
-            space.append("li").text('Age: ${mdata.age}');
-            space.append("li").text('BBTYPE: ${mdata.bbtype}');
-            space.append("li").text('Race: ${mdata.ethnicity}');
-            space.append("li").text('Sex: ${mdata.gender}');
-            space.append("li").text('Location: ${mdata.location}');
-            space.append("li").text('WFREQ: ${mdata.wfreq}');
+            space.append("li").text(`ID Number: ${mdata.id}`);
+            space.append("li").text(`Age: ${mdata.age}`);
+            space.append("li").text(`BBTYPE: ${mdata.bbtype}`);
+            space.append("li").text(`Ethnicity: ${mdata.ethnicity}`);
+            space.append("li").text(`Gender: ${mdata.gender}`);
+            space.append("li").text(`Location: ${mdata.location}`);
+            space.append("li").text(`WFREQ: ${mdata.wfreq}`);
 
             var list = [];
             for (var j=0; j < sample_value.length; j++)
@@ -69,6 +82,15 @@ function makePage(){
                 }
             }];
 
+            var blayout = {
+                title: 'Sample values',
+                showlegend: false, 
+                height: 600, 
+                width: 1200, 
+                xaxis: {title: 'OTU ID'},
+                yaxis: {Title: 'Sample values'},
+            }
+
             Plotly.newPlot('bubble', bubble, blayout);
 
             function createHbar() {
@@ -81,7 +103,7 @@ function makePage(){
                     y: otu_id.slice(0,10),
                     type: 'bar',
                     text: otu_label.slice(0,10),
-                    orientation: 'v',
+                    orientation: 'h',
                     transforms: [{
                         type: 'sort',
                         target: 'y',
@@ -97,15 +119,15 @@ function makePage(){
                     height: 600,
                     width: 600
                 };
-                plotly.newPlot("bar", hbar, layout);
+                Plotly.newPlot("bar", hbar, layout);
 
             }
-
+            createHbar();
 
         }
 
     })
 
-}
+};
 
 makePage();
